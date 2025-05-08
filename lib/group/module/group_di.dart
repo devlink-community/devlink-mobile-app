@@ -19,8 +19,8 @@ import 'package:devlink_mobile_app/group/domain/usecase/start_timer_use_case.dar
 import 'package:devlink_mobile_app/group/domain/usecase/stop_timer_use_case.dart';
 import 'package:devlink_mobile_app/group/domain/usecase/update_group_use_case.dart';
 import 'package:devlink_mobile_app/group/presentation/group_create/group_create_screen_root.dart';
-import 'package:devlink_mobile_app/group/presentation/group_list/group_list_screen_root.dart';
 import 'package:devlink_mobile_app/group/presentation/group_search/group_search_screen_root.dart';
+
 import 'package:devlink_mobile_app/group/presentation/group_setting/group_settings_screen_root.dart';
 import 'package:devlink_mobile_app/group/presentation/group_timer/group_timer_screen_root.dart';
 import 'package:devlink_mobile_app/group/presentation/group_timer/mock_screen/mock_screen.dart';
