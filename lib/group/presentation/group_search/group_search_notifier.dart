@@ -66,6 +66,8 @@ class GroupSearchNotifier extends _$GroupSearchNotifier {
         break;
 
       case OnGoBack():
+        // Root에서 처리할 네비게이션 액션
+
         break;
       case OnRemoveRecentSearch(:final query):
         final updatedRecentSearches = [...state.recentSearches]..remove(query);
@@ -74,5 +76,16 @@ class GroupSearchNotifier extends _$GroupSearchNotifier {
       case OnClearAllRecentSearches():
         state = state.copyWith(recentSearches: []);
     }
+  }
+
+  // 특정 최근 검색어 삭제
+  void removeRecentSearch(String query) {
+    final updatedRecentSearches = [...state.recentSearches]..remove(query);
+    state = state.copyWith(recentSearches: updatedRecentSearches);
+  }
+
+  // 최근 검색어 전체 삭제
+  void clearRecentSearches() {
+    state = state.copyWith(recentSearches: []);
   }
 }
