@@ -52,6 +52,7 @@ dependencies:
   flutter_local_notifications: ^19.2.0
 
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -66,7 +67,10 @@ dev_dependencies:
   freezed: ^3.0.6
   json_serializable: ^6.9.5
   riverpod_generator: ^2.6.5
+<<<<<<< HEAD
   mockito: ^5.4.5
+=======
+>>>>>>> 6ca1249 (add: image_picker 패키지 위치 변경)
   
 
 # For information on the generic Dart part of this file, see the
