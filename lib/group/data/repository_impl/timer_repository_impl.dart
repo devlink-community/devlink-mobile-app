@@ -4,7 +4,6 @@ import 'package:devlink_mobile_app/group/data/mapper/timer_mapper.dart';
 import 'package:devlink_mobile_app/group/domain/model/member_timer.dart';
 import 'package:devlink_mobile_app/group/domain/model/timer_session.dart';
 import 'package:devlink_mobile_app/group/domain/repository/timer_repository.dart';
-import 'package:devlink_mobile_app/group/presentation/group_timer/group_timer_state.dart';
 
 class TimerRepositoryImpl implements TimerRepository {
   final TimerDataSource _dataSource;
