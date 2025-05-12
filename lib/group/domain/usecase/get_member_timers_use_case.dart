@@ -1,10 +1,7 @@
 import 'package:devlink_mobile_app/core/result/result.dart';
 import 'package:devlink_mobile_app/group/domain/model/member_timer.dart';
 import 'package:devlink_mobile_app/group/domain/repository/timer_repository.dart';
-<<<<<<< HEAD
 
-=======
->>>>>>> bb80563 (fix(groupTimer): GetMemberTimersUseCase에서 presentation 의존성 제거)
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class GetMemberTimersUseCase {
