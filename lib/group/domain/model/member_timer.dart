@@ -1,8 +1,12 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import 'package:devlink_mobile_app/group/domain/model/member_timer_status.dart';
 =======
 import 'package:devlink_mobile_app/group/presentation/group_timer/components/member_timer_status.dart';
 >>>>>>> e07d01d (feat(groupTimer): MemberTimer 클래스를 domain 계층으로 이동)
+=======
+import 'package:devlink_mobile_app/group/domain/model/member_timer_status.dart';
+>>>>>>> cacb942 (fix(groupTimer): MemberTimer import 경로 수정)
 
 class MemberTimer {
   final String memberId;
