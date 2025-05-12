@@ -153,7 +153,11 @@ class GroupSettingsNotifier extends _$GroupSettingsNotifier {
       owner: currentGroup.owner,
       imageUrl: state.imageUrl,
       createdAt: currentGroup.createdAt,
+<<<<<<< HEAD
       updatedAt: DateTime.now(),
+=======
+      updatedAt: currentGroup.updatedAt,
+>>>>>>> 6c1556e (fix(group): group 생성자에 수정 (createAt, updateAt))
     );
 
     // 그룹 업데이트
