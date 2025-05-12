@@ -68,19 +68,16 @@ class GroupSettingsNotifier extends _$GroupSettingsNotifier {
         final validCount = count < 1 ? 1 : count;
         state = state.copyWith(limitMemberCount: validCount);
 
-
       case ImageUrlChanged(:final imageUrl):
         state = state.copyWith(imageUrl: imageUrl);
 
       case HashTagAdded(:final tag):
-
         final trimmed = tag.trim();
         if (trimmed.isEmpty ||
             state.hashTags.any((t) => t.content == trimmed) ||
             trimmed.length > 20) {
           return;
         }
-
 
         final newTag = HashTag(
           id: DateTime.now().toString(),
@@ -155,11 +152,8 @@ class GroupSettingsNotifier extends _$GroupSettingsNotifier {
       limitMemberCount: state.limitMemberCount,
       owner: currentGroup.owner,
       imageUrl: state.imageUrl,
-<<<<<<< HEAD
       createdAt: currentGroup.createdAt,
       updatedAt: DateTime.now(),
-=======
->>>>>>> f6e8a4c (feat(group_settings): 그룹설정 notifier 구현)
     );
 
     // 그룹 업데이트
