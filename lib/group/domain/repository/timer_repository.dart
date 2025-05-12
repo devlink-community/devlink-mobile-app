@@ -1,7 +1,6 @@
 import 'package:devlink_mobile_app/core/result/result.dart';
 import 'package:devlink_mobile_app/group/domain/model/member_timer.dart';
 import 'package:devlink_mobile_app/group/domain/model/timer_session.dart';
-import 'package:devlink_mobile_app/group/presentation/group_timer/group_timer_state.dart';
 
 abstract interface class TimerRepository {
   /// 새 타이머 세션 시작
