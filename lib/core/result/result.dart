@@ -28,7 +28,7 @@ class Failure {
 }
 
 /// 실패 유형 분류
-enum FailureType { network, unauthorized, timeout, server, parsing, unknown }
+enum FailureType { network, unauthorized, timeout, server, parsing, validation, unknown }
 
 /// Exception을 Failure로 매핑하는 유틸
 Failure mapExceptionToFailure(Object error, StackTrace stackTrace) {
