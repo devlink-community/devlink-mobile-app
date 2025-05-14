@@ -15,31 +15,11 @@ class GroupListScreenRoot extends ConsumerWidget {
     final state = ref.watch(groupListNotifierProvider);
     final notifier = ref.watch(groupListNotifierProvider.notifier);
 
-    // 선택된 그룹을 관찰하고 변경되면 다이얼로그 표시
     ref.listen(
       groupListNotifierProvider.select((value) => value.selectedGroup),
       (previous, next) {
         if (next is AsyncData && next.value != null) {
           _showGroupDialog(context, next.value!, notifier);
-        }
-      },
-    );
-
-    // 그룹 참여 결과를 관찰하고 성공 시 그룹 상세 페이지로 이동
-    ref.listen(
-      groupListNotifierProvider.select((value) => value.joinGroupResult),
-      (previous, next) {
-        if (previous is AsyncLoading && next is AsyncData) {
-          final selectedGroup = state.selectedGroup;
-          if (selectedGroup is AsyncData && selectedGroup.value != null) {
-            Navigator.of(context).pop(); // 다이얼로그 닫기
-            context.push('/group/${selectedGroup.value!.id}'); // 상세 페이지로 이동
-          }
-        } else if (next is AsyncError) {
-          // 에러 처리 (스낵바 등)
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('참여 실패: ${next.error}')));
         }
       },
     );
@@ -54,7 +34,11 @@ class GroupListScreenRoot extends ConsumerWidget {
             context.push('/group/create');
           case OnCloseDialog():
             Navigator.of(context).pop();
-          case OnTapGroup() || OnJoinGroup() || OnLoadGroupList():
+          case OnJoinGroup(:final groupId):
+            notifier.onAction(action);
+            Navigator.of(context).pop();
+            context.push('/group/$groupId');
+          default:
             notifier.onAction(action);
         }
       },
@@ -68,10 +52,23 @@ class GroupListScreenRoot extends ConsumerWidget {
   ) {
     showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (context) {
         return GroupJoinDialog(
           group: group,
-          onAction: (action) => notifier.onAction(action),
+          onAction: (action) {
+            if (action is OnJoinGroup) {
+              Navigator.of(context).pop();
+              notifier.onAction(action);
+              Future.delayed(const Duration(milliseconds: 100), () {
+                if (context.mounted) {
+                  context.push('/group/${(action).groupId}');
+                }
+              });
+            } else {
+              notifier.onAction(action);
+            }
+          },
         );
       },
     );
