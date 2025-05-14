@@ -39,7 +39,6 @@ dependencies:
   riverpod_annotation: ^2.6.1
   hooks_riverpod: ^2.6.1
   go_router: ^15.1.1
-<<<<<<< HEAD
   image_picker: ^1.1.2
   fl_chart: ^0.71.0
   google_fonts: ^6.1.0
@@ -51,12 +50,7 @@ dependencies:
   firebase_storage: ^12.4.5
   firebase_messaging: ^15.2.5
   flutter_local_notifications: ^19.2.0
-
-
-=======
-  image_picker: ^1.0.4
   intl: ^0.20.2
->>>>>>> 40283d8 (add: intl 패키지 추가)
 
 dev_dependencies:
   flutter_test:
@@ -72,10 +66,7 @@ dev_dependencies:
   freezed: ^3.0.6
   json_serializable: ^6.9.5
   riverpod_generator: ^2.6.5
-<<<<<<< HEAD
   mockito: ^5.4.5
-=======
->>>>>>> 6ca1249 (add: image_picker 패키지 위치 변경)
   
 
 # For information on the generic Dart part of this file, see the
