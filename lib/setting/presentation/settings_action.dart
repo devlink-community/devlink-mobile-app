@@ -27,4 +27,12 @@ sealed class SettingsAction with _$SettingsAction {
   const factory SettingsAction.openUrlPrivacyPolicy() = OpenUrlPrivacyPolicy;
 
   const factory SettingsAction.openUrlAppInfo() = OpenUrlAppInfo;
+
+  // 앱 스토어 링크 액션 추가
+  const factory SettingsAction.openAppStore() = OpenAppStore;
+
+  const factory SettingsAction.openPlayStore() = OpenPlayStore;
+
+  // 앱 버전 정보 로드 액션
+  const factory SettingsAction.loadAppVersion() = LoadAppVersion;
 }

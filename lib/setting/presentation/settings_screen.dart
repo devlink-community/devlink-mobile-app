@@ -1,9 +1,11 @@
 // lib/setting/presentation/settings_screen.dart
+import 'dart:io';
 import 'package:devlink_mobile_app/core/styles/app_color_styles.dart';
 import 'package:devlink_mobile_app/core/styles/app_text_styles.dart';
 import 'package:devlink_mobile_app/setting/presentation/settings_action.dart';
 import 'package:devlink_mobile_app/setting/presentation/settings_state.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SettingsScreen extends StatelessWidget {
   final SettingsState state;
@@ -127,6 +129,9 @@ class SettingsScreen extends StatelessWidget {
                                   const SettingsAction.OnTapOpenSourceLicenses(),
                                 ),
                           ),
+
+                          // 새로 추가: 앱 버전 정보 및 스토어 링크
+                          _buildVersionItem(context),
                         ],
                       ),
                     ),
@@ -183,12 +188,6 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Text(
-                  //   '버전 1.0.0',
-                  //   style: AppTextStyles.captionRegular.copyWith(
-                  //     color: AppColorStyles.gray80,
-                  //   ),
-                  // ),
                 ],
               ),
             ),
@@ -228,6 +227,71 @@ class SettingsScreen extends StatelessWidget {
       ),
       onTap: onTap,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    );
+  }
+
+  // 앱 버전 정보 및 스토어 링크 위젯 추가
+  Widget _buildVersionItem(BuildContext context) {
+    final hasVersionData =
+        state.appVersionResult.hasValue && state.appVersionResult.value != null;
+    final isLoading = state.appVersionResult.isLoading;
+    final hasError = state.appVersionResult.hasError;
+
+    String versionText = '앱 버전 정보를 가져오는 중...';
+
+    if (hasVersionData) {
+      versionText = state.appVersionResult.value!.versionWithBuild;
+    } else if (hasError) {
+      versionText = '버전 정보를 가져올 수 없습니다';
+    }
+
+    return InkWell(
+      onTap: () {
+        if (hasVersionData) {
+          final platform =
+              Platform.isIOS
+                  ? const SettingsAction.openAppStore()
+                  : const SettingsAction.openPlayStore();
+          onAction(platform);
+        } else if (!isLoading) {
+          onAction(const SettingsAction.loadAppVersion());
+        }
+      },
+      child: ListTile(
+        leading: Icon(Icons.update, color: AppColorStyles.success, size: 24),
+        title: Text(
+          '앱 버전',
+          style: AppTextStyles.subtitle1Medium.copyWith(
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        subtitle: Text(
+          versionText,
+          style: AppTextStyles.captionRegular.copyWith(
+            color: hasError ? AppColorStyles.error : AppColorStyles.gray80,
+          ),
+        ),
+        trailing:
+            isLoading
+                ? SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColorStyles.primary100,
+                  ),
+                )
+                : const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 16,
+                  color: Colors.grey,
+                ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 6.0,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
     );
   }
 }

@@ -66,6 +66,18 @@ class SettingsScreenRoot extends ConsumerWidget {
             );
           case OpenUrlAppInfo():
             await _launchUrl('https://pub.dev/');
+          case OpenAppStore():
+            if (state.appVersionResult.hasValue &&
+                state.appVersionResult.value != null) {
+              await _launchUrl(state.appVersionResult.value!.appStoreUrl);
+            }
+          case OpenPlayStore():
+            if (state.appVersionResult.hasValue &&
+                state.appVersionResult.value != null) {
+              await _launchUrl(state.appVersionResult.value!.playStoreUrl);
+            }
+          case LoadAppVersion():
+            notifier.onAction(action);
         }
       },
     );

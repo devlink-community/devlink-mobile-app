@@ -21,7 +21,7 @@ class MemberSkeleton extends StatelessWidget {
 
   const MemberSkeleton({
     super.key,
-    this.count = 9, // 기본 스켈레톤 아이템 개수
+    this.count = 3, // 기본 스켈레톤 아이템 개수
     this.crossAxisCount = 3, // 기본 열 개수
     this.crossAxisSpacing = 12,
     this.mainAxisSpacing = 16,

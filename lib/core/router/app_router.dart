@@ -36,10 +36,12 @@ final _pathsWithoutBottomNav = ['/community/write', '/group/create'];
 @riverpod
 class DevLoginState extends _$DevLoginState {
   @override
-  bool build() => false; // true로 설정하여 개발용 강제 로그인 상태로 시작
+  bool build() => true; // true로 설정하여 개발용 강제 로그인 상태로 시작
 
   void toggle() => state = !state;
+
   void enable() => state = true;
+
   void disable() => state = false;
 }
 

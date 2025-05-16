@@ -271,7 +271,7 @@ class _GroupTimerScreenState extends State<GroupTimerScreen> {
               MemberSectionHeader(title: title, color: color, icon: icon),
 
               // 스켈레톤 UI 표시
-              const MemberSkeleton(count: 4),
+              const MemberSkeleton(count: 3),
             ],
           ),
         ),

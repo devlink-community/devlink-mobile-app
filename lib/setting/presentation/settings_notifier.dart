@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../auth/domain/usecase/delete_account_use_case.dart';
+import '../domain/service/app_version_service.dart';
 import '../domain/usecase/logout_usecase.dart';
 import '../module/settings_di.dart';
 import 'settings_action.dart';
@@ -12,11 +13,17 @@ part 'settings_notifier.g.dart';
 class SettingsNotifier extends _$SettingsNotifier {
   late final LogoutUseCase _logoutUseCase;
   late final DeleteAccountUseCase _deleteAccountUseCase;
+  late final AppVersionService _appVersionService;
 
   @override
   SettingsState build() {
     _logoutUseCase = ref.watch(logoutUseCaseProvider);
     _deleteAccountUseCase = ref.watch(deleteAccountUseCaseProvider);
+    _appVersionService = ref.watch(appVersionServiceProvider);
+
+    // 컴포넌트가 처음 로드될 때 앱 버전 정보를 자동으로 로드
+    _loadAppVersion();
+
     return const SettingsState();
   }
 
@@ -26,6 +33,8 @@ class SettingsNotifier extends _$SettingsNotifier {
         await _handleLogout();
       case OnTapDeleteAccount():
         await _handleDeleteAccount();
+      case LoadAppVersion():
+        await _loadAppVersion();
       // 화면 이동 액션들은 Root에서 처리됨
       case OnTapEditProfile():
       case OnTapChangePassword():
@@ -34,6 +43,8 @@ class SettingsNotifier extends _$SettingsNotifier {
       // URL 열기 액션들도 Root에서 처리됨
       case OpenUrlPrivacyPolicy():
       case OpenUrlAppInfo():
+      case OpenAppStore():
+      case OpenPlayStore():
         break;
     }
   }
@@ -52,5 +63,15 @@ class SettingsNotifier extends _$SettingsNotifier {
     final email = 'current@example.com'; // 실제 구현 필요
     final asyncResult = await _deleteAccountUseCase.execute(email);
     state = state.copyWith(deleteAccountResult: asyncResult);
+  }
+
+  Future<void> _loadAppVersion() async {
+    state = state.copyWith(appVersionResult: const AsyncLoading());
+    try {
+      final appVersion = await _appVersionService.getAppVersion();
+      state = state.copyWith(appVersionResult: AsyncData(appVersion));
+    } catch (e, stackTrace) {
+      state = state.copyWith(appVersionResult: AsyncError(e, stackTrace));
+    }
   }
 }
