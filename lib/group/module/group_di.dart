@@ -136,8 +136,6 @@ final List<GoRoute> groupRoutes = [
   GoRoute(
     path: '/group/:id/attendance',
     builder: (context, state) {
-      // Group 객체가 필요하므로 id를 통해 group 정보를 가져오는 로직 필요
-      // 이 부분은 GroupScreenRoot처럼 구현하는 것이 좋습니다
       final groupId = state.pathParameters['id']!;
       return AttendanceScreenRoot(groupId: groupId);
     },
