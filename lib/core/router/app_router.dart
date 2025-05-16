@@ -33,7 +33,7 @@ part 'app_router.g.dart';
 @riverpod
 class DevLoginState extends _$DevLoginState {
   @override
-  bool build() => true; // true로 설정하여 개발용 강제 로그인 상태로 시작 (false이면 로그인 로직대로 동작)
+  bool build() => false; // true로 설정하여 개발용 강제 로그인 상태로 시작 (false이면 로그인 로직대로 동작)
 
   void toggle() => state = !state;
 
