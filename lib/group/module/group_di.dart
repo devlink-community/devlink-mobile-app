@@ -29,6 +29,8 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../attendance/presentation/attendance/attendance_screen_root.dart';
+
 part 'group_di.g.dart';
 
 // DataSource 프로바이더
@@ -125,11 +127,20 @@ final List<GoRoute> groupRoutes = [
         (context, state) =>
             GroupTimerScreenRoot(groupId: state.pathParameters['id']!),
   ),
+  // GoRoute(
+  //   path: '/group/:id/attendance',
+  //   builder:
+  //       (context, state) =>
+  //           MockGroupAttendanceScreen(groupId: state.pathParameters['id']!),
+  // ),
   GoRoute(
     path: '/group/:id/attendance',
-    builder:
-        (context, state) =>
-            MockGroupAttendanceScreen(groupId: state.pathParameters['id']!),
+    builder: (context, state) {
+      // Group 객체가 필요하므로 id를 통해 group 정보를 가져오는 로직 필요
+      // 이 부분은 GroupScreenRoot처럼 구현하는 것이 좋습니다
+      final groupId = state.pathParameters['id']!;
+      return AttendanceScreenRoot(groupId: groupId);
+    },
   ),
   GoRoute(
     path: '/group/:id/settings',
