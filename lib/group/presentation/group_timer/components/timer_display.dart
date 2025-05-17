@@ -122,6 +122,7 @@ class TimerDisplay extends StatelessWidget {
   }) {
     return GestureDetector(
       onTap: onToggle,
+      behavior: HitTestBehavior.opaque, // 탭 영역 확장하여 터치 감지 개선
       child: Container(
         width: size,
         height: size,

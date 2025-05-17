@@ -30,6 +30,7 @@ class _GroupTimerScreenState extends State<GroupTimerScreen> {
   late ScrollController _scrollController;
   bool _isTimerVisible = true;
   bool _isMessageExpanded = false; // 메시지 펼치기/접기 상태
+  double _scrollProgress = 0.0; // 스크롤 진행도 (0.0 ~ 1.0)
 
   @override
   void initState() {
@@ -61,11 +62,16 @@ class _GroupTimerScreenState extends State<GroupTimerScreen> {
     final double timerThreshold = 220; // 타이머 영역 높이
     final isTimerCurrentlyVisible = _scrollController.offset < timerThreshold;
 
-    if (isTimerCurrentlyVisible != _isTimerVisible) {
-      setState(() {
-        _isTimerVisible = isTimerCurrentlyVisible;
-      });
-    }
+    // 스크롤 진행도 계산 (0.0 ~ 1.0)
+    final double progress = (_scrollController.offset / timerThreshold).clamp(
+      0.0,
+      1.0,
+    );
+
+    setState(() {
+      _isTimerVisible = isTimerCurrentlyVisible;
+      _scrollProgress = progress;
+    });
   }
 
   @override
@@ -86,11 +92,34 @@ class _GroupTimerScreenState extends State<GroupTimerScreen> {
         isRunning ? const Color(0xFF7070EE) : const Color(0xFFE6E6FA);
 
     return Scaffold(
+      // 배경색을 점진적으로 변경 (스크롤 진행도에 따라)
       backgroundColor: Colors.white,
       // 앱바를 포함한 상단 영역을 집중시간 배경으로 통일
       appBar: _buildAppBar(primaryBgColor),
       body: Stack(
         children: [
+          // 배경 그라데이션 (스크롤에 따라 점차 흐려짐)
+          AnimatedOpacity(
+            duration: const Duration(milliseconds: 200),
+            opacity: (1.0 - _scrollProgress).clamp(0.2, 1.0), // 완전히 투명해지지 않도록
+            child: Container(
+              height: MediaQuery.of(context).size.height,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    primaryBgColor,
+                    secondaryBgColor,
+                    Colors.white.withOpacity(0.8), // 점차 흰색으로 전환
+                    Colors.white,
+                  ],
+                  stops: const [0.0, 0.3, 0.6, 1.0], // 그라데이션 비율 조정
+                ),
+              ),
+            ),
+          ),
+
           // 메인 콘텐츠
           CustomScrollView(
             controller: _scrollController,
@@ -99,21 +128,11 @@ class _GroupTimerScreenState extends State<GroupTimerScreen> {
               SliverToBoxAdapter(
                 child: Container(
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [primaryBgColor, secondaryBgColor],
-                    ),
+                    // 배경은 이제 Stack의 전체 배경으로 이동하여 투명하게 처리
+                    color: Colors.transparent,
                   ),
                   child: Stack(
                     children: [
-                      // 그라데이션 물결 애니메이션 배경
-                      if (isRunning)
-                        GradientWaveAnimation(
-                          primaryColor: primaryBgColor,
-                          secondaryColor: secondaryBgColor,
-                        ),
-
                       // 타이머 콘텐츠
                       Column(
                         children: [
@@ -122,13 +141,48 @@ class _GroupTimerScreenState extends State<GroupTimerScreen> {
                           TimerDisplay(
                             elapsedSeconds: widget.state.elapsedSeconds,
                             timerStatus: widget.state.timerStatus,
-                            onToggle:
-                                () => widget.onAction(
-                                  const GroupTimerAction.toggleTimer(),
-                                ),
+                            onToggle: () {
+                              // 상태에 따라 적절한 액션 직접 호출
+                              if (widget.state.timerStatus ==
+                                  TimerStatus.running) {
+                                widget.onAction(
+                                  const GroupTimerAction.pauseTimer(),
+                                );
+                              } else if (widget.state.timerStatus ==
+                                      TimerStatus.paused ||
+                                  widget.state.timerStatus ==
+                                      TimerStatus.initial) {
+                                widget.onAction(
+                                  const GroupTimerAction.startTimer(),
+                                );
+                              } else {
+                                widget.onAction(
+                                  const GroupTimerAction.resetTimer(),
+                                );
+                              }
+                            },
                           ),
+                          // 하단 여백 (줄무늬 가리기 위해)
+                          const SizedBox(height: 20),
                         ],
                       ),
+
+                      // 그라데이션 물결 애니메이션은 전체 화면에 사용하지 않고 타이머 부분만 사용
+                      if (isRunning)
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          // 높이를 타이머 부분만큼만 제한
+                          bottom: 20, // 하단 여백과 일치
+                          child: ClipRect(
+                            child: GradientWaveAnimation(
+                              primaryColor: primaryBgColor.withOpacity(0.5),
+                              secondaryColor: secondaryBgColor.withOpacity(0.5),
+                              height: 200, // 물결 높이 제한
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -147,7 +201,6 @@ class _GroupTimerScreenState extends State<GroupTimerScreen> {
                 icon: Icons.check_circle,
                 members: _getActiveMembers(),
                 isLoading:
-                    //widget.state.isLoading ||
                     widget
                         .state
                         .memberTimers
@@ -161,7 +214,6 @@ class _GroupTimerScreenState extends State<GroupTimerScreen> {
                 icon: Icons.nightlight,
                 members: _getInactiveMembers(),
                 isLoading:
-                    // widget.state.isLoading ||
                     widget
                         .state
                         .memberTimers
@@ -244,7 +296,17 @@ class _GroupTimerScreenState extends State<GroupTimerScreen> {
         child: TimerDisplay(
           elapsedSeconds: widget.state.elapsedSeconds,
           timerStatus: widget.state.timerStatus,
-          onToggle: () => widget.onAction(const GroupTimerAction.toggleTimer()),
+          onToggle: () {
+            // 상태에 따라 적절한 액션 직접 호출
+            if (widget.state.timerStatus == TimerStatus.running) {
+              widget.onAction(const GroupTimerAction.pauseTimer());
+            } else if (widget.state.timerStatus == TimerStatus.paused ||
+                widget.state.timerStatus == TimerStatus.initial) {
+              widget.onAction(const GroupTimerAction.startTimer());
+            } else {
+              widget.onAction(const GroupTimerAction.resetTimer());
+            }
+          },
           isCompact: true, // 작은 디스플레이 모드
         ),
       ),
