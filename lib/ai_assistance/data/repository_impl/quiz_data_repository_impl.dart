@@ -1,7 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
-
 import '../../../core/result/result.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../domain/model/quiz.dart';

@@ -1,7 +1,5 @@
 // lib/community/presentation/community_list/community_list_screen_root.dart
 import 'package:devlink_mobile_app/community/module/util/community_tab_type_enum.dart';
-import 'package:devlink_mobile_app/core/event/app_event.dart';
-import 'package:devlink_mobile_app/core/event/app_event_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

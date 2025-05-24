@@ -2,6 +2,7 @@
 import 'package:devlink_mobile_app/auth/domain/model/user.dart';
 import 'package:devlink_mobile_app/community/domain/model/hash_tag.dart';
 import 'package:devlink_mobile_app/core/auth/auth_provider.dart';
+import 'package:devlink_mobile_app/group/data/data_source/group_data_source.dart';
 import 'package:devlink_mobile_app/group/domain/model/group.dart';
 import 'package:devlink_mobile_app/group/domain/usecase/create_group_use_case.dart';
 import 'package:devlink_mobile_app/group/module/group_di.dart';
@@ -14,10 +15,12 @@ part 'group_create_notifier.g.dart';
 @riverpod
 class GroupCreateNotifier extends _$GroupCreateNotifier {
   late final CreateGroupUseCase _createGroupUseCase;
+  late final GroupDataSource _groupDataSource;
 
   @override
   GroupCreateState build() {
     _createGroupUseCase = ref.watch(createGroupUseCaseProvider);
+    _groupDataSource = ref.watch(groupDataSourceProvider);
     return const GroupCreateState();
   }
 
@@ -186,6 +189,30 @@ class GroupCreateNotifier extends _$GroupCreateNotifier {
         return;
       }
 
+      // 🔧 수정: 이미지 업로드 처리
+      String? finalImageUrl = state.imageUrl;
+
+      // 로컬 이미지인 경우 Firebase Storage에 업로드
+      if (finalImageUrl != null && finalImageUrl.startsWith('file://')) {
+        try {
+          // 임시 그룹 ID 생성 (실제로는 그룹 생성 후 업데이트하는 방식으로 변경될 수 있음)
+          final tempGroupId = 'temp_${DateTime.now().millisecondsSinceEpoch}';
+          final localImagePath = finalImageUrl.replaceFirst('file://', '');
+
+          // Firebase Storage에 업로드
+          finalImageUrl = await _groupDataSource.updateGroupImage(
+            tempGroupId,
+            localImagePath,
+          );
+        } catch (e) {
+          state = state.copyWith(
+            isSubmitting: false,
+            errorMessage: '이미지 업로드에 실패했습니다. 다시 시도해주세요.',
+          );
+          return;
+        }
+      }
+
       // 🔧 수정: 새로운 Group 모델 구조에 맞게 생성
       final group = Group(
         id: 'temp_id', // 서버에서 생성될 ID
@@ -199,7 +226,7 @@ class GroupCreateNotifier extends _$GroupCreateNotifier {
                 .map((tag) => tag.content)
                 .toList(), // HashTag 객체 리스트 → 문자열 리스트로 변환
         maxMemberCount: state.limitMemberCount,
-        imageUrl: state.imageUrl,
+        imageUrl: finalImageUrl, // 업로드된 이미지 URL 또는 null
         createdAt: DateTime.now(),
         memberCount: 1 + state.invitedMembers.length, // 방장 + 초대된 멤버 수
         isJoinedByCurrentUser: true, // 생성자는 자동으로 그룹에 가입됨

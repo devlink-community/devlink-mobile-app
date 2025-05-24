@@ -35,7 +35,10 @@ abstract interface class GroupDataSource {
     String groupId,
   );
 
-  /// 그룹 이미지 업데이트
+  /// 🆕 그룹 생성용 이미지 업로드 - 내부에서 현재 사용자 정보 처리
+  Future<String> uploadGroupCreationImage(String localImagePath);
+
+  /// 그룹 이미지 업데이트 (기존 그룹용)
   Future<String> updateGroupImage(String groupId, String localImagePath);
 
   /// 통합 그룹 검색 (키워드, 태그 통합) - 내부에서 현재 사용자의 가입 그룹 정보 처리

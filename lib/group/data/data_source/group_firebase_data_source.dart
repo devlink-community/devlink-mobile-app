@@ -21,7 +21,11 @@ class GroupFirebaseDataSource implements GroupDataSource {
     required FirebaseFirestore firestore,
     required FirebaseStorage storage,
     required FirebaseAuth auth,
-  }) : _core = GroupCoreFirebase(firestore: firestore, auth: auth),
+  }) : _core = GroupCoreFirebase(
+         firestore: firestore,
+         auth: auth,
+         storage: storage, // 🔧 수정: FirebaseStorage 전달
+       ),
        _query = GroupQueryFirebase(firestore: firestore, auth: auth),
        _timer = GroupTimerFirebase(firestore: firestore, auth: auth),
        _stats = GroupStatsFirebase(
@@ -60,6 +64,11 @@ class GroupFirebaseDataSource implements GroupDataSource {
     // 캐시 무효화
     _query.invalidateJoinedGroupsCache();
     _query.invalidateGroupMembersCache(groupId);
+  }
+
+  // 🆕 새로운 메서드: 그룹 생성용 이미지 업로드
+  Future<String> uploadGroupCreationImage(String localImagePath) async {
+    return _core.uploadGroupCreationImage(localImagePath);
   }
 
   // ===== Query 기능 위임 =====

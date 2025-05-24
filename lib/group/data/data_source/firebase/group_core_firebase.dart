@@ -1,20 +1,26 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:devlink_mobile_app/core/utils/api_call_logger.dart';
 import 'package:devlink_mobile_app/core/utils/app_logger.dart';
 import 'package:devlink_mobile_app/core/utils/messages/auth_error_messages.dart';
 import 'package:devlink_mobile_app/core/utils/messages/group_error_messages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 /// 그룹 핵심 기능 (생성, 수정, 삭제, 가입, 탈퇴)
 class GroupCoreFirebase {
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
+  final FirebaseStorage _storage;
 
   GroupCoreFirebase({
     required FirebaseFirestore firestore,
     required FirebaseAuth auth,
+    required FirebaseStorage storage,
   }) : _firestore = firestore,
-       _auth = auth;
+       _auth = auth,
+       _storage = storage;
 
   // Collection 참조들
   CollectionReference<Map<String, dynamic>> get _groupsCollection =>
@@ -47,6 +53,52 @@ class GroupCoreFirebase {
       'userName': userName,
       'profileUrl': profileUrl,
     };
+  }
+
+  /// 🆕 새로운 메서드: 그룹 생성용 이미지 업로드
+  Future<String> uploadGroupCreationImage(String localImagePath) async {
+    return ApiCallDecorator.wrap(
+      'GroupCore.uploadGroupCreationImage',
+      () async {
+        try {
+          // URL인 경우 (이미 업로드된 이미지 사용)
+          if (localImagePath.startsWith('http')) {
+            return localImagePath;
+          }
+
+          // 로컬 파일 업로드
+          final userId = _getCurrentUserId();
+          final timestamp = DateTime.now().millisecondsSinceEpoch;
+          final fileName = '${timestamp}_${localImagePath.split('/').last}';
+
+          // 그룹 생성용 이미지는 별도 폴더에 저장
+          final storageRef = _storage.ref().child(
+            'group_creation_images/$userId/$fileName',
+          );
+
+          // 파일 업로드
+          final uploadTask = await storageRef.putFile(File(localImagePath));
+
+          // 다운로드 URL 가져오기
+          final downloadUrl = await uploadTask.ref.getDownloadURL();
+
+          AppLogger.info(
+            '그룹 생성용 이미지 업로드 완료: $downloadUrl',
+            tag: 'GroupCoreFirebase',
+          );
+
+          return downloadUrl;
+        } catch (e) {
+          AppLogger.error(
+            '그룹 생성용 이미지 업로드 오류',
+            tag: 'GroupCoreFirebase',
+            error: e,
+          );
+          throw Exception('이미지 업로드에 실패했습니다');
+        }
+      },
+      params: {'localImagePath': localImagePath},
+    );
   }
 
   /// 그룹 생성
